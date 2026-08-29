@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { Butterfly } from "@/components/Butterfly";
+import { SUBMISSION_ACCEPT } from "@/lib/safeFile";
+import { submitAnswer } from "./submitAnswer";
 import {
   CATEGORY_LABEL,
   formatSize,
@@ -18,11 +20,21 @@ export function StudentResources({
   client,
   levelId,
   classId,
+  studentId,
+  studentName,
+  onSubmitted,
 }: {
   client: SupabaseClient<Database>;
   levelId: string | null;
   classId: string | null;
+  studentId: string;
+  studentName: string;
+  onSubmitted?: () => void;
 }) {
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [target, setTarget] = useState<ResourceRow | null>(null);
+  const [sending, setSending] = useState<string | null>(null);
+  const [sent, setSent] = useState<string | null>(null);
   const levels = useLevels(client);
   const [effectiveLevel, setEffectiveLevel] = useState<string | null>(levelId);
   const [teacherIds, setTeacherIds] = useState<string[] | null>(null);
@@ -70,6 +82,37 @@ export function StudentResources({
       await openResource(client, row, download);
     } catch {
       setError("تعذّر فتح الملف.");
+    }
+  };
+
+  const pick = (row: ResourceRow) => {
+    setTarget(row);
+    setSent(null);
+    setError(null);
+    if (fileInput.current) {
+      fileInput.current.value = "";
+      fileInput.current.click();
+    }
+  };
+
+  const onFileChosen = async (file: File | undefined) => {
+    if (!file || !target) return;
+    const resource = target;
+    setSending(resource.id);
+    const result = await submitAnswer(client, {
+      resource,
+      studentId,
+      studentName,
+      classId,
+      file,
+    });
+    setSending(null);
+    setTarget(null);
+    if (result.ok) {
+      setSent(resource.id);
+      onSubmitted?.();
+    } else {
+      setError(result.reason);
     }
   };
 
@@ -197,6 +240,16 @@ export function StudentResources({
                         <button type="button" className="btn-text" onClick={() => open(r, true)}>
                           تحميل
                         </button>
+                        {r.category === "exercices" ? (
+                          <button
+                            type="button"
+                            className="btn-primary"
+                            disabled={sending === r.id}
+                            onClick={() => pick(r)}
+                          >
+                            {sending === r.id ? "…" : sent === r.id ? "تم الإرسال ✓" : "إرسال جواب"}
+                          </button>
+                        ) : null}
                       </div>
                     </li>
                   ))}
@@ -206,6 +259,14 @@ export function StudentResources({
           })}
         </div>
       )}
+
+      <input
+        ref={fileInput}
+        type="file"
+        className="hidden"
+        accept={SUBMISSION_ACCEPT}
+        onChange={(e) => void onFileChosen(e.target.files?.[0])}
+      />
     </section>
   );
 }
