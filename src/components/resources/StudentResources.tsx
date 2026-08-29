@@ -25,33 +25,44 @@ export function StudentResources({
 }) {
   const levels = useLevels(client);
   const [effectiveLevel, setEffectiveLevel] = useState<string | null>(levelId);
-  const [resolved, setResolved] = useState(levelId != null || classId == null);
+  const [teacherIds, setTeacherIds] = useState<string[] | null>(null);
+  const [resolved, setResolved] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    if (levelId || !classId) {
-      setEffectiveLevel(levelId);
-      setResolved(true);
-      return;
-    }
     let active = true;
-    client
-      .from("classes")
-      .select("level_id")
-      .eq("id", classId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!active) return;
-        setEffectiveLevel(data?.level_id ?? null);
-        setResolved(true);
-      });
+    setResolved(false);
+    (async () => {
+      let lvl = levelId;
+      if (!lvl && classId) {
+        const { data } = await client
+          .from("classes")
+          .select("level_id")
+          .eq("id", classId)
+          .maybeSingle();
+        lvl = data?.level_id ?? null;
+      }
+      let teachers: string[] = [];
+      if (classId) {
+        const { data } = await client
+          .from("teacher_classes")
+          .select("teacher_id")
+          .eq("class_id", classId);
+        teachers = (data ?? []).map((t) => t.teacher_id);
+      }
+      if (!active) return;
+      setEffectiveLevel(lvl);
+      setTeacherIds(teachers);
+      setResolved(true);
+    })();
     return () => {
       active = false;
     };
   }, [client, levelId, classId]);
 
-  const { rows, loading, error, setError } = useResourceList(client, effectiveLevel);
+  const { rows, loading, error, setError } = useResourceList(client, effectiveLevel, teacherIds);
+
   const levelName = levels.find((l) => l.id === effectiveLevel)?.name;
 
   const open = async (row: ResourceRow, download: boolean) => {

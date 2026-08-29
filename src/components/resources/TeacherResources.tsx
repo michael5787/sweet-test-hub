@@ -21,7 +21,7 @@ export function TeacherResources({
   teacherId: string;
 }) {
   const levels = useLevels(client);
-  const { rows, loading, error, setError, reload } = useResourceList(client);
+  const { rows, loading, error, setError, reload } = useResourceList(client, null, [teacherId]);
 
   const [category, setCategory] = useState<Category>("cours");
   const [title, setTitle] = useState("");
