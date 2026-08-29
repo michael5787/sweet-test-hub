@@ -232,6 +232,9 @@ function UserEditor({
 
   const filteredClasses = levelId === "" ? classes : classes.filter((c) => c.level_id === levelId);
 
+  const levelNameOfClass = (c: ClassRow) =>
+    levels.find((l) => l.id === c.level_id)?.name ?? "بدون مستوى";
+
   const toggleTeacherClass = (id: string) =>
     setTeacherClasses((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
@@ -306,6 +309,41 @@ function UserEditor({
           </option>
         ))}
       </select>
+      {space === "taleem" ? (
+        <fieldset className="sm:col-span-3">
+          <legend className="mb-2 text-xs font-semibold text-muted-foreground">
+            الأقسام المسندة إلى الأستاذ (يمكن اختيار أكثر من قسم)
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {classes.length === 0 ? (
+              <span className="text-xs text-muted-foreground">لا توجد أقسام بعد.</span>
+            ) : (
+              classes.map((c) => {
+                const checked = teacherClasses.includes(c.id);
+                return (
+                  <label
+                    key={c.id}
+                    className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-xs transition-colors ${
+                      checked
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-card text-muted-foreground"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="accent-primary"
+                      checked={checked}
+                      onChange={() => toggleTeacherClass(c.id)}
+                    />
+                    {c.name}
+                    <span className="text-muted-foreground">({levelNameOfClass(c)})</span>
+                  </label>
+                );
+              })
+            )}
+          </div>
+        </fieldset>
+      ) : null}
       <div className="flex gap-2">
         <button type="submit" className="btn-primary" disabled={busy}>
           حفظ
