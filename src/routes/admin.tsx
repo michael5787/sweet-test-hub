@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { UserRound } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SpaceAuth, Wordmark } from "@/components/SpaceAuth";
 import { LevelsPanel } from "@/components/admin/LevelsPanel";
