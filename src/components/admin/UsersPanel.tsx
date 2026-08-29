@@ -232,6 +232,9 @@ function UserEditor({
 
   const filteredClasses = levelId === "" ? classes : classes.filter((c) => c.level_id === levelId);
 
+  const levelNameOfClass = (c: ClassRow) =>
+    levels.find((l) => l.id === c.level_id)?.name ?? "بدون مستوى";
+
   const toggleTeacherClass = (id: string) =>
     setTeacherClasses((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
