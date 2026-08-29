@@ -53,15 +53,28 @@ export function useLevels(client: SupabaseClient<Database>) {
   return levels;
 }
 
-export function useResourceList(client: SupabaseClient<Database>, levelId?: string | null) {
+export function useResourceList(
+  client: SupabaseClient<Database>,
+  levelId?: string | null,
+  teacherIds?: string[] | null,
+) {
   const [rows, setRows] = useState<ResourceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const teacherKey = teacherIds ? teacherIds.join(",") : null;
+
   const load = useCallback(async () => {
     setLoading(true);
+    if (teacherKey !== null && teacherKey === "") {
+      setRows([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
     let query = client.from("resources").select("*").order("created_at", { ascending: false });
     if (levelId) query = query.eq("level_id", levelId);
+    if (teacherKey) query = query.in("teacher_id", teacherKey.split(","));
     const { data, error: err } = await query;
     if (err) setError("تعذّر تحميل الملفات.");
     else {
@@ -69,7 +82,8 @@ export function useResourceList(client: SupabaseClient<Database>, levelId?: stri
       setRows(data ?? []);
     }
     setLoading(false);
-  }, [client, levelId]);
+  }, [client, levelId, teacherKey]);
+
 
   useEffect(() => {
     void load();
