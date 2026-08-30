@@ -117,7 +117,7 @@ function StudentLogin() {
   };
 
   return (
-    <div className="w-full max-w-[420px] rounded-[28px] border border-border bg-card px-8 py-10 sm:px-10">
+    <div className="w-full max-w-[420px] rounded-[28px] border border-border bg-card/95 px-8 py-10 shadow-lg backdrop-blur-sm sm:px-10">
       <h2 className="text-center text-2xl font-normal text-foreground">
         {mode === "login" ? "تسجيل الدخول" : mode === "signup" ? "إنشاء حساب" : "نسيت كلمة المرور"}
       </h2>
