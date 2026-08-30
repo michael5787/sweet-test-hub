@@ -4,6 +4,7 @@ import { getSpaceClient } from "@/lib/spaces";
 import { translateError } from "@/components/SpaceAuth";
 import { MainNav } from "@/components/MainNav";
 import { PasswordField } from "@/components/PasswordField";
+import { PublicBackdrop } from "@/components/PublicBackdrop";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,8 +28,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-canvas px-4 pb-16 pt-24">
-      <MainNav space="talameed" />
+    <PublicBackdrop>
+      <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 pb-16 pt-24">
+        <MainNav space="talameed" />
       <div className="text-center">
         <div dir="ltr" className="font-wordmark text-5xl tracking-tight">
           <span className="text-brand-green">m</span>
@@ -48,16 +50,17 @@ function Index() {
 
       <StudentLogin />
 
-      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <Link to="/taleem" className="underline underline-offset-4 hover:text-foreground">
-          وصول الأساتذة
-        </Link>
-        <span className="text-border">|</span>
-        <Link to="/admin" className="underline underline-offset-4 hover:text-foreground">
-          وصول الإدارة
-        </Link>
-      </div>
-    </main>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <Link to="/taleem" className="underline underline-offset-4 hover:text-foreground">
+            وصول الأساتذة
+          </Link>
+          <span className="text-border">|</span>
+          <Link to="/admin" className="underline underline-offset-4 hover:text-foreground">
+            وصول الإدارة
+          </Link>
+        </div>
+      </main>
+    </PublicBackdrop>
   );
 }
 
@@ -114,7 +117,7 @@ function StudentLogin() {
   };
 
   return (
-    <div className="w-full max-w-[420px] rounded-[28px] border border-border bg-card px-8 py-10 sm:px-10">
+    <div className="w-full max-w-[420px] rounded-[28px] border border-border bg-card/95 px-8 py-10 shadow-lg backdrop-blur-sm sm:px-10">
       <h2 className="text-center text-2xl font-normal text-foreground">
         {mode === "login" ? "تسجيل الدخول" : mode === "signup" ? "إنشاء حساب" : "نسيت كلمة المرور"}
       </h2>
