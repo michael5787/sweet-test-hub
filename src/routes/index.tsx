@@ -4,6 +4,7 @@ import { getSpaceClient } from "@/lib/spaces";
 import { translateError } from "@/components/SpaceAuth";
 import { MainNav } from "@/components/MainNav";
 import { PasswordField } from "@/components/PasswordField";
+import { PublicBackdrop } from "@/components/PublicBackdrop";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,16 +50,17 @@ function Index() {
 
       <StudentLogin />
 
-      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <Link to="/taleem" className="underline underline-offset-4 hover:text-foreground">
-          وصول الأساتذة
-        </Link>
-        <span className="text-border">|</span>
-        <Link to="/admin" className="underline underline-offset-4 hover:text-foreground">
-          وصول الإدارة
-        </Link>
-      </div>
-    </main>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <Link to="/taleem" className="underline underline-offset-4 hover:text-foreground">
+            وصول الأساتذة
+          </Link>
+          <span className="text-border">|</span>
+          <Link to="/admin" className="underline underline-offset-4 hover:text-foreground">
+            وصول الإدارة
+          </Link>
+        </div>
+      </main>
+    </PublicBackdrop>
   );
 }
 
